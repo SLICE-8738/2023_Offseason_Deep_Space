@@ -7,35 +7,102 @@ package frc.robot.slicelibs;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.SparkMaxPIDController;
-import com.revrobotics.CANSparkMaxLowLevel.MotorType;
+import com.revrobotics.CANSparkMax.ControlType;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class PositionalSubsystem extends SubsystemBase {
+    private CANSparkMax[] motors;
+    private RelativeEncoder[] encoders;
+    private SparkMaxPIDController[] pids;
+    double targetReference;
+    ControlType currentControlType;
 
-  protected CANSparkMax[] motors;
-  protected RelativeEncoder[] encoders;
-  protected SparkMaxPIDController[] controllers;
+    public PositionalSubsystem(int[] ids, boolean[] inverted, double kP, double kI, double kD, double positionConversionFactor, double velocityConversionFactor) {
+        if (ids.length != inverted.length) throw new IllegalArgumentException("ids and inverted must be the same length");
+        
+        motors = new CANSparkMax[ids.length];
+        encoders = new RelativeEncoder[ids.length];
+        pids = new SparkMaxPIDController[ids.length];
 
-  /** Creates a new PositionalSubsystem. */
-  public PositionalSubsystem(int[] ids, double P, double I, double D, double positionalFactor, double velocityFactor) {
-    motors = new CANSparkMax[ids.length];
-    encoders = new RelativeEncoder[ids.length];
-    controllers = new SparkMaxPIDController[ids.length];
-    for(int i=0; i<ids.length; i++){
-      motors[i] = new CANSparkMax(ids[i], MotorType.kBrushless);
-      encoders[i] = motors[i].getEncoder();
-      controllers[i] = motors[i].getPIDController();
-      controllers[i].setP(P);
-      controllers[i].setI(I);
-      controllers[i].setD(D);
-      encoders[i].setPositionConversionFactor(positionalFactor);
-      encoders[i].setVelocityConversionFactor(velocityFactor);
+        for (int i = 0; i < ids.length; i++) {
+            motors[i] = new CANSparkMax(ids[i], CANSparkMax.MotorType.kBrushless);
+            motors[i].setInverted(inverted[i]);
+            encoders[i] = motors[i].getEncoder();
+            pids[i] = motors[i].getPIDController();
+            pids[i].setP(kP);
+            pids[i].setI(kI);
+            pids[i].setD(kD);
+            encoders[i].setPositionConversionFactor(positionConversionFactor);
+            encoders[i].setVelocityConversionFactor(velocityConversionFactor);
+        }
+
+        targetReference = 0;
+        currentControlType = ControlType.kDutyCycle;
     }
-  }
 
-  @Override
-  public void periodic() {
-    // This method will be called once per scheduler run
-  }
+    public void set(double speed) {
+        for (CANSparkMax motor : motors) {
+            motor.set(speed);
+        }
+        currentControlType = ControlType.kDutyCycle;
+    }
+
+    public void setVelocity(double velocity) {
+        for (SparkMaxPIDController pid : pids) {
+            pid.setReference(velocity, ControlType.kVelocity);
+        }
+
+        targetReference = velocity;
+        currentControlType = ControlType.kVelocity;
+    }
+
+    public void setPosition(double position) {
+        for (SparkMaxPIDController pid : pids) {
+            pid.setReference(position, ControlType.kPosition);
+        }
+
+        targetReference = position;
+        currentControlType = ControlType.kPosition;
+    }
+
+    public void setVoltage(double voltage) {
+        for (CANSparkMax motor : motors) {
+            motor.setVoltage(voltage);
+        }
+        currentControlType = ControlType.kVoltage;
+    }
+
+    public void setEncoderPosition(double position) {
+        for (RelativeEncoder encoder: encoders) {
+            encoder.setPosition(position);
+        }
+    }
+
+    public double getVelocity() {
+        double velocity = 0;
+        for (RelativeEncoder encoder : encoders) {
+            velocity += encoder.getVelocity();
+        }
+        return velocity / encoders.length;
+    }
+
+    public double getPosition() {
+        double position = 0;
+        for (RelativeEncoder encoder : encoders) {
+            position += encoder.getPosition();
+        }
+        return position / encoders.length;
+    }
+
+    public boolean atTarget(double threshold) {
+        if (currentControlType == ControlType.kVelocity) {
+            return Math.abs(getVelocity() - targetReference) < threshold;
+        } else if (currentControlType == ControlType.kPosition) {
+            return Math.abs(getPosition() - targetReference) < threshold;
+        } else {
+            return false;
+        }
+    }
+  
 }
