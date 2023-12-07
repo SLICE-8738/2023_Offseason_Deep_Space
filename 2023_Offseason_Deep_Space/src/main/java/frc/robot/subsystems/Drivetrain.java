@@ -13,25 +13,27 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
 public class Drivetrain extends SubsystemBase {
   
-  private CANSparkMax motorBL, motorBR, motorTL, motorTR; // bottom left, bottom right, top left, top right
+  private CANSparkMax backleft, backright, frontleft, frontright; // bottom left, bottom right, top left, top right
   private MotorControllerGroup leftM, rightM; // left and right motor controller groups
-  private DifferentialDrive dd;
+  private DifferentialDrive drivetrain; //differential drive
 
   /** Creates a new drivetrain. */
   public Drivetrain() {
-     motorBL = new CANSparkMax(15, MotorType.kBrushed);
-     motorBR = new CANSparkMax(18, MotorType.kBrushed);
-     motorTL = new CANSparkMax(16, MotorType.kBrushed);
-     motorTR = new CANSparkMax(17, MotorType.kBrushed);
+     backleft = new CANSparkMax(15, MotorType.kBrushed);
+     backright = new CANSparkMax(18, MotorType.kBrushed);
+     frontleft = new CANSparkMax(16, MotorType.kBrushed);
+     frontright = new CANSparkMax(17, MotorType.kBrushed);
 
-      leftM = new MotorControllerGroup(motorBL, motorTL);
-      rightM = new MotorControllerGroup(motorBR, motorTR);
+     frontleft.setInverted(true);
 
-      dd = new DifferentialDrive(leftM, rightM);
+    leftM = new MotorControllerGroup(backleft, frontleft);
+    rightM = new MotorControllerGroup(backright, backleft);
+
+    drivetrain = new DifferentialDrive(leftM, rightM);
   }
 
   public void drive(double fSpeed, double rotSpeed){
-    dd.arcadeDrive(fSpeed, rotSpeed);
+    drivetrain.arcadeDrive(fSpeed, rotSpeed);
   }
 
   @Override
