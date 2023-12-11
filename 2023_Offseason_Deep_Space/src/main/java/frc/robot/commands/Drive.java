@@ -4,28 +4,25 @@
 
 package frc.robot.commands;
 
-import frc.robot.subsystems.*;
-import frc.robot.Button;
-import edu.wpi.first.wpilibj.Joystick;
+import frc.robot.subsystems.DriveTrain;
+import edu.wpi.first.wpilibj.PS4Controller;
 import edu.wpi.first.wpilibj2.command.CommandBase;
 
-/** A Drive command that uses a Drivetrain subsystem. */
-public class DriveCommand extends CommandBase {
+/** An example command that uses an example subsystem. */
+public class Drive extends CommandBase {
   @SuppressWarnings({"PMD.UnusedPrivateField", "PMD.SingularField"})
-  private final Drivetrain m_drivetrain;
-
-  private static Joystick leftJoystick = Button.leftJoystick;
-  private static Joystick rightJoystick = Button.rightJoystick;
-
+  private final DriveTrain m_DriveTrain;
+  private final PS4Controller controller;
   /**
-   * Creates a new DriveCommand.
+   * Creates a new ExampleCommand.
+   *
    * @param subsystem The subsystem used by this command.
    */
-  public DriveCommand(Drivetrain drivetrain) {
+  public Drive(DriveTrain subsystem, PS4Controller controller) {
+    m_DriveTrain = subsystem;
+    this.controller = controller;
     // Use addRequirements() here to declare subsystem dependencies.
-    addRequirements(drivetrain);
-
-    m_drivetrain = drivetrain;
+    addRequirements(m_DriveTrain);
   }
 
   // Called when the command is initially scheduled.
@@ -35,17 +32,15 @@ public class DriveCommand extends CommandBase {
   // Called every time the scheduler runs while the command is scheduled.
   @Override
   public void execute() {
-    //Sets robot speed and turn speed
-    double forwardSpeed = leftJoystick.getY();
-    double turnSpeed = rightJoystick.getX();
+    m_DriveTrain.drive(controller.getLeftY(), controller.getRightX());
 
-    m_drivetrain.ArcadeDrive(forwardSpeed, turnSpeed);
   }
 
   // Called once the command ends or is interrupted.
   @Override
   public void end(boolean interrupted) {
-    m_drivetrain.ArcadeDrive(0, 0);
+    m_DriveTrain.drive(0, 0);
+
   }
 
   // Returns true when the command should end.
