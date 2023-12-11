@@ -20,16 +20,16 @@ import edu.wpi.first.wpilibj2.command.Command;
  * subsystems, commands, and button mappings) should be declared here.
  */
 public class RobotContainer {
-  // The robot's subsystems and commands are defined here...
   private final ExampleSubsystem m_exampleSubsystem = new ExampleSubsystem();
-
   private final ExampleCommand m_autoCommand = new ExampleCommand(m_exampleSubsystem);
-
+  
   private final DriveTrain m_DriveTrain = new DriveTrain();
   private final PS4Controller m_controller = new PS4Controller(0);
   private final Drive m_Drive = new Drive(m_DriveTrain, m_controller);
+
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
+    m_drivetrain.setDefaultCommand(m_drive);
     // Configure the button bindings
     configureButtonBindings();
     m_DriveTrain.setDefaultCommand(m_Drive);
