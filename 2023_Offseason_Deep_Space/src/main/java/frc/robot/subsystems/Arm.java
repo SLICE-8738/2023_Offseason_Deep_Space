@@ -4,14 +4,13 @@
 
 package frc.robot.subsystems;
 
-import edu.wpi.first.wpilibj2.command.PIDCommand;
-import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.slicelibs.PositionalSubsystem;
 
 public class Arm extends PositionalSubsystem {
+  
   /** Creates a new ExampleSubsystem. */
-  public Arm () {
-    
+  public Arm () { 
+    super(new int[]{0},new boolean[]{true}, 9.7,7.9,8.7,7.7,8.9);
   }
 
   @Override

@@ -6,10 +6,11 @@ package frc.robot.subsystems;
 
 import frc.robot.slicelibs.PositionalSubsystem;
 
-public class Wrist extends PositionalSubsystem {
+public class Piston extends PositionalSubsystem {
+  
   /** Creates a new ExampleSubsystem. */
-  public Wrist() {
-    super(new int[]{0},new boolean[]{true}, 9.7,7.9,8.7,7.7,8);
+  public Piston () { 
+    super(new int[]{0},new boolean[]{true}, 9.7,7.9,8.7,7.7,8.9);
   }
 
   @Override

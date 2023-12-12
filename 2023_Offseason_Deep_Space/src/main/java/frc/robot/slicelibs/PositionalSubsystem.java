@@ -18,7 +18,7 @@ public class PositionalSubsystem extends SubsystemBase {
     double targetReference;
     ControlType currentControlType;
 
-    public PositionalSubsystem(int[] ids, boolean[] inverted, double kP, double kI, double kD, double positionConversionFactor, double velocityConversionFactor) {
+    protected PositionalSubsystem(int[] ids, boolean[] inverted, double kP, double kI, double kD, double positionConversionFactor, double velocityConversionFactor) {
         if (ids.length != inverted.length) throw new IllegalArgumentException("ids and inverted must be the same length");
         
         motors = new CANSparkMax[ids.length];
